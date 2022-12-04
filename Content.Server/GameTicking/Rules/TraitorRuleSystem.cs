@@ -263,7 +263,43 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
     /// <param name="code">Uplink codes</param>
     private void SendTraitorBriefing(EntityUid mind, string[] codewords, Note[]? code)
     {
-        if (!_mindSystem.TryGetSession(mind, out var session))
+        var results = new List<IPlayerSession>(traitorCount);
+        if (prefList.Count == 0)
+        {
+            Logger.InfoS("preset", "Insufficient ready players to fill up with traitors, stopping the selection.");
+            return results;
+        }
+
+        for (var i = 0; i < traitorCount; i++)
+        {
+            results.Add(_random.PickAndTake(prefList));
+            Logger.InfoS("preset", "Selected a preferred traitor.");
+        }
+        return results;
+    }
+
+    public async void MakeTraitor(IPlayerSession traitor)
+    {
+        var mind = traitor.Data.ContentData()?.Mind;
+        if (mind == null)
+        {
+            Logger.ErrorS("preset", "Failed getting mind for picked traitor.");
+            return;
+        }
+
+        if (!await _db.GetWhitelistStatusAsync(traitor.UserId))
+            return;
+
+        // creadth: we need to create uplink for the antag.
+        // PDA should be in place already
+        DebugTools.AssertNotNull(mind.OwnedEntity);
+
+        var startingBalance = _cfg.GetCVar(CCVars.TraitorStartingBalance);
+
+        if (mind.CurrentJob != null)
+            startingBalance = Math.Max(startingBalance - mind.CurrentJob.Prototype.AntagAdvantage, 0);
+
+        if (!_uplink.AddUplink(mind.OwnedEntity!.Value, startingBalance))
             return;
 
        _chatManager.DispatchServerMessage(session, Loc.GetString("traitor-role-greeting"));

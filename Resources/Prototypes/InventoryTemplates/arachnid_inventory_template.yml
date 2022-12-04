@@ -44,7 +44,7 @@
       slotTexture: ears
       slotFlags: EARS
       stripTime: 3
-      uiWindowPos: 2,2
+      uiWindowPos: 2,0
       strippingWindowPos: 2,0
       displayName: Ears
     - name: head
@@ -131,3 +131,24 @@
       strippingWindowPos: 2,5
       dependsOn: outerClothing
       displayName: Suit Storage
+    - name: underpants
+      slotTexture: underpants
+      slotFlags: UNDERPANTS
+      stripTime: 8
+      uiWindowPos: 4,0
+      strippingWindowPos: 4,0
+      displayName: Underpants
+    - name: undershirt
+      slotTexture: undershirt
+      slotFlags: UNDERSHIRT
+      stripTime: 8
+      uiWindowPos: 4,1
+      strippingWindowPos: 4,1
+      displayName: Undershirt
+    - name: socks
+      slotTexture: socks
+      slotFlags: SOCKS
+      stripTime: 8
+      uiWindowPos: 4,2
+      strippingWindowPos: 4,2
+      displayName: Socks

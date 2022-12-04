@@ -188,9 +188,11 @@ namespace Content.Server.Ghost.Roles
 
         public void UnregisterGhostRole(Entity<GhostRoleComponent> role)
         {
-            var comp = role.Comp;
-            if (!_ghostRoles.ContainsKey(comp.Identifier) || _ghostRoles[comp.Identifier] != role)
+            if (!await _db.GetWhitelistStatusAsync(player.UserId))
+            {
+                CloseEui(player);
                 return;
+            }
 
             _ghostRoles.Remove(comp.Identifier);
             UpdateAllEui();
