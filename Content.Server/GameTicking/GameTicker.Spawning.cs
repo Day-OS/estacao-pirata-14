@@ -12,6 +12,14 @@ using Content.Shared.Players;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
+using Content.Server.Storage.Components;
+using Content.Shared.Database;
+using Content.Shared.GameTicking;
+using Content.Shared.Ghost;
+using Content.Shared.Inventory;
+using Content.Shared.Preferences;
+using Content.Shared.Roles;
+using Content.Shared.SimpleStation14.Loadouts;
 using JetBrains.Annotations;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
@@ -20,9 +28,9 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
+using Job = Content.Server.Roles.Job;
 
 namespace Content.Server.GameTicking
-{
     public sealed partial class GameTicker
     {
         [Dependency] private readonly IAdminManager _adminManager = default!;
@@ -230,6 +238,50 @@ namespace Content.Server.GameTicking
             {
                 EntityManager.AddComponent<OwOAccentComponent>(mob);
             }
+
+            // Parkstation-loadouts start
+            var invSystem = EntitySystem.Get<InventorySystem>();
+            if (invSystem.TryGetSlotEntity(mob, "back", out var item))
+            {
+                EntityManager.TryGetComponent<ServerStorageComponent>(item, out var inventory);
+
+                foreach (var loadout in character.LoadoutPreferences)
+                {
+                    var slot = "";
+                    if (!_prototypeManager.TryIndex<LoadoutPrototype>(loadout, out var loadoutProto)) continue;
+
+                    if (loadoutProto.JobWhitelist != null) if (!loadoutProto.JobWhitelist.Contains(jobPrototype.ID)) continue;
+                    if (loadoutProto.JobBlacklist != null) if (loadoutProto.JobBlacklist.Contains(jobPrototype.ID)) continue;
+
+                    var spawned = EntityManager.SpawnEntity(loadoutProto.Item, EntityManager.GetComponent<TransformComponent>(mob).Coordinates);
+
+                    if (EntityManager.TryGetComponent<ClothingComponent>(spawned, out var clothingComp))
+                    {
+                        if (invSystem.TryGetSlots(mob, out var slotDefinitions) && slotDefinitions != null)
+                        {
+                            var deleted = false;
+                            foreach (var slotCur in slotDefinitions)
+                            {
+                                if (!clothingComp.Slots.HasFlag(slotCur.SlotFlags) || deleted) continue;
+
+                                if (invSystem.TryGetSlotEntity(mob, slotCur.Name, out var slotItem)) {
+                                    var slotItemMeta = EntityManager.GetComponent<MetaDataComponent>(slotItem.Value);
+                                    if (loadoutProto.Exclusive || slotItemMeta.EntityName == "grey jumpsuit")
+                                    EntityManager.DeleteEntity((EntityUid)slotItem);
+                                }
+
+                                slot = slotCur.Name;
+                                deleted = true;
+                            }
+                        }
+                    }
+
+                    if (invSystem.TryEquip(mob, spawned, slot)) continue;
+                    if (inventory?.Storage == null) continue;
+                    if (inventory.Storage.CanInsert(spawned)) inventory.Storage.Insert(spawned);
+                }
+            }
+            // Parkstation-loadouts end
 
             _stationJobs.TryAssignJob(station, jobPrototype, player.UserId);
 

@@ -63,6 +63,7 @@ namespace Content.IntegrationTests.Tests.Preferences
                 },
                 PreferenceUnavailableMode.StayInLobby,
                 new List<string> (),
+                new List<string> (),
                 new List<string>()
             );
         }

@@ -83,3 +83,5 @@
     doAfter: 3
   - type: Occluder
     enabled: false
+  - type: Airtight
+    fixVacuum: true
