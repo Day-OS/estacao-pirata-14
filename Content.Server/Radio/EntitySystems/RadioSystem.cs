@@ -83,7 +83,7 @@ public sealed class RadioSystem : EntitySystem
     {
         if (language == null)
         {
-            language = _language.GetLanguage(messageSource); // Will return galactic common for non-player sources
+            language = _language.GetLanguage(messageSource);
         }
 
         // TODO if radios ever garble / modify messages, feedback-prevention needs to be handled better than this.
