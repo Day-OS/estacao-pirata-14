@@ -456,7 +456,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("fontSize", speech.FontSize),
             ("message", FormattedMessage.EscapeText(obfuscated)));
 
-        SendInVoiceRange(ChatChannel.Local, name, message, wrappedMessage, obfuscated, wrappedObfuscated, source, range);
+        SendInVoiceRange(ChatChannel.Local, name, message, wrappedMessage, obfuscated, wrappedObfuscated, source, range, languageOverride: language);
 
         var ev = new EntitySpokeEvent(source, message, null, obfuscated, language);
         RaiseLocalEvent(source, ev, true);
@@ -544,7 +544,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             if (MessageRangeCheck(session, data, range) != MessageRangeCheckResult.Full)
                 continue; // Won't get logged to chat, and ghosts are too far away to see the pop-up, so we just won't send it to them.
 
-            var canUnderstand = _language.CanUnderstand(source, listener);
+            var canUnderstand = _language.CanUnderstand(listener, language);
             var finalMessage = canUnderstand ? message : languageObfuscatedMessage;
 
             if (data.Range <= WhisperClearRange)
@@ -644,7 +644,8 @@ public sealed partial class ChatSystem : SharedChatSystem
             obfuscatedWrappedMessage: string.Empty, // will be skipped anyway
             source,
             hideChat ? ChatTransmitRange.HideChat : ChatTransmitRange.Normal,
-            player.UserId);
+            player.UserId,
+            languageOverride: LanguageSystem.Universal);
         _adminLogger.Add(LogType.Chat, LogImpact.Low, $"LOOC from {player:Player}: {message}");
     }
 
@@ -745,8 +746,11 @@ public sealed partial class ChatSystem : SharedChatSystem
         string obfuscatedWrappedMessage,
         EntityUid source,
         ChatTransmitRange range,
-        NetUserId? author = null)
+        NetUserId? author = null,
+        LanguagePrototype? languageOverride = null)
     {
+        var language = languageOverride ?? _language.GetLanguage(source);
+
         foreach (var (session, data) in GetRecipients(source, VoiceRange))
         {
             var entRange = MessageRangeCheck(session, data, range);
@@ -758,7 +762,8 @@ public sealed partial class ChatSystem : SharedChatSystem
                 continue;
             EntityUid listener = session.AttachedEntity.Value;
 
-            if (channel == ChatChannel.LOOC || channel == ChatChannel.Emotes || _language.CanUnderstand(source, listener))
+
+            if (channel == ChatChannel.LOOC || channel == ChatChannel.Emotes || _language.CanUnderstand(listener, language))
             {
                 _chatManager.ChatMessageToOne(channel, message, wrappedMessage, source, entHideChat, session.Channel, author: author);
             }
