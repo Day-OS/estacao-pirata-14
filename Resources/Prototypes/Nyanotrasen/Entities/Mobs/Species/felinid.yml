@@ -56,6 +56,17 @@
       Unsexed: MaleFelinid
   - type: Felinid
   - type: CanEscapeInventory
+  - type: NpcFactionMember
+    factions:
+    - NanoTrasen
+    - Felinid
+  - type: LanguageSpeaker
+    speaks:
+    - GalacticCommon
+    - SolCommon
+    understands:
+    - GalacticCommon
+    - SolCommon
 
 - type: entity
   save: false
