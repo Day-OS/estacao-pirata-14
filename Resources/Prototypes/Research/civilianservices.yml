@@ -231,6 +231,8 @@
   - NekomimeticTranslator
   - DraconicTranslator
   - SolCommonTranslator
+  - RootSpeakTranslator
+  - BasicGalaticCommonTranslatorImplanter
 
 # Tier 3
 
@@ -283,3 +285,11 @@
   cost: 15000
   recipeUnlocks:
   - XenoTranslator
+  - AdvancedGalaticCommonTranslatorImplanter
+  - BubblishTranslatorImplanter
+  - NekomimeticTranslatorImplanter
+  - DraconicTranslatorImplanter
+  - CanilunztTranslatorImplanter
+  - SolCommonTranslatorImplanter
+  - RootSpeakTranslatorImplanter
+  - AnimalTranslator
