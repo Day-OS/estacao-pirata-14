@@ -101,6 +101,11 @@
     price: 100
   - type: Appearance
   - type: WiresVisuals
+  - type: LanguageSpeaker
+    speaks:
+    - GalacticCommon
+    understands:
+    - GalacticCommon
 
 - type: entity
   parent: VendingMachine
