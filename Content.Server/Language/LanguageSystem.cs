@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Text;
-using Content.Server.GameTicking.Events;
 using Content.Shared.GameTicking;
 using Content.Shared.Language;
 using Robust.Shared.Random;
@@ -9,36 +8,21 @@ using Robust.Server.GameObjects;
 
 namespace Content.Server.Language;
 
-public sealed class LanguageSystem : SharedLanguageSystem
+public sealed partial class LanguageSystem : SharedLanguageSystem
 {
     /// <summary>
     ///   A random number added to each pseudo-random number's seed. Changes every round.
     /// </summary>
     public int RandomRoundSeed { get; private set; }
 
-    [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-
     public override void Initialize()
     {
         base.Initialize();
+
         SubscribeLocalEvent<LanguageSpeakerComponent, ComponentInit>(OnInitLanguageSpeaker);
-        SubscribeAllEvent<RoundStartingEvent>(it => RandomRoundSeed = _random.Next());
-        SubscribeLocalEvent<LanguageSpeakerComponent, LanguageMenuActionEvent>(MenuEvent);
-    }
+        SubscribeAllEvent<RoundStartedEvent>(it => RandomRoundSeed = _random.Next());
 
-    private void MenuEvent(EntityUid uid, LanguageSpeakerComponent component, LanguageMenuActionEvent args)
-    {
-        if (!TryComp(uid, out ActorComponent? actor))
-            return;
-
-        _uiSystem.TryOpen(uid, LanguageMenuUiKey.Key, actor.PlayerSession);
-
-        UpdateUserInterface(uid, component, args);
-    }
-
-    private void UpdateUserInterface(EntityUid uid, LanguageSpeakerComponent component, EntityEventArgs args)
-    {
-
+        InitializeWindows();
     }
 
     private void OnInitLanguageSpeaker(EntityUid uid, LanguageSpeakerComponent component, ComponentInit args)
