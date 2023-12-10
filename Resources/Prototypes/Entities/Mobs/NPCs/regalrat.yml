@@ -114,6 +114,13 @@
   - type: Grammar
     attributes:
       gender: male
+  - type: LanguageSpeaker
+    speaks:
+    - GalacticCommon
+    - Mouse
+    understands:
+    - GalacticCommon
+    - Mouse
 
 - type: entity
   id: MobRatKingBuff
@@ -273,6 +280,12 @@
     guides:
     - MinorAntagonists
   
+  - type: LanguageSpeaker
+    speaks:
+    - Mouse
+    understands:
+    - GalacticCommon
+    - Mouse
 
 - type: weightedRandomEntity
   id: RatKingLoot

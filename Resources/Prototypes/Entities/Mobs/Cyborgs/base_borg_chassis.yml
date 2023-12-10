@@ -209,6 +209,13 @@
   - type: GuideHelp
     guides:
       - Cyborgs
+  - type: LanguageSpeaker
+    speaks:
+    - GalaticCommon
+    - RobotTalk
+    understands:
+    - GalaticCommon
+    - RobotTalk
 
 - type: entity
   id: BaseBorgChassisNT

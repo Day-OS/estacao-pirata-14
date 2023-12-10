@@ -114,6 +114,13 @@
       cell_slot:
         name: power-cell-slot-component-slot-name-default
         startingItem: PowerCellHyper
+  - type: LanguageSpeaker
+    speaks:
+    - GalacticCommon
+    - RobotTalk
+    understands:
+    - GalacticCommon
+    - RobotTalk
   - type: ContainerContainer
     containers:
       cell_slot: !type:ContainerSlot
