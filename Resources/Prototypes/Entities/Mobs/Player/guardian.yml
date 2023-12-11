@@ -168,6 +168,11 @@
           map: [ "enum.DamageStateVisualLayers.BaseUnshaded" ]
           color: "#40a7d7"
           shader: unshaded
+    - type: LanguageSpeaker
+      speaks:
+      - GalacticCommon
+      understands:
+      - GalacticCommon
 
 - type: entity
   name: HoloClown
@@ -248,6 +253,11 @@
     - type: HTN
       rootTask:
         task: SimpleHumanoidHostileCompound
+    - type: LanguageSpeaker
+      speaks:
+      - GalacticCommon
+      understands:
+      - GalacticCommon
 
 - type: entity
   id: ActionToggleGuardian
