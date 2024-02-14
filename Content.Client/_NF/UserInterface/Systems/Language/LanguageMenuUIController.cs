@@ -1,10 +1,8 @@
 using Content.Client._NF.Language;
 using Content.Client.Gameplay;
-using Content.Client.UserInterface.Systems.Chat;
 using Content.Shared.Language;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
-using Robust.Shared.Console;
 using Robust.Shared.Timing;
 using static Content.Shared.Language.Systems.SharedLanguageSystem;
 
@@ -15,11 +13,7 @@ public sealed class LanguageMenuUIController : UIController, IOnStateEntered<Gam
     public LanguageMenuWindow? _languageWindow;
     private TimeSpan _lastToggle = TimeSpan.Zero;
 
-    public string? LastPreferredLanguage;
-    public Action<List<string>>? LanguagesChanged;
-
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IConsoleHost _consoleHost = default!;
 
     public override void Initialize()
     {
@@ -34,7 +28,6 @@ public sealed class LanguageMenuUIController : UIController, IOnStateEntered<Gam
             return;
 
         _languageWindow.UpdateState(ev);
-        LanguagesChanged?.Invoke(ev.Options);
     }
 
     private void OnActionMenu(EntityUid uid, LanguageSpeakerComponent component, LanguageMenuActionEvent args)
@@ -50,29 +43,16 @@ public sealed class LanguageMenuUIController : UIController, IOnStateEntered<Gam
         else
         {
             _languageWindow!.Open();
-            RequestUpdate();
+            EntityManager.EntityNetManager?.SendSystemNetworkMessage(new RequestLanguageMenuStateMessage());
         }
 
         args.Handled = true;
     }
 
-    public void RequestUpdate()
-    {
-        EntityManager.EntityNetManager?.SendSystemNetworkMessage(new RequestLanguageMenuStateMessage());
-    }
-
-    public void SetLanguage(string id)
-    {
-        _consoleHost.ExecuteCommand("lsselectlang " + id);
-        LastPreferredLanguage = id;
-    }
-
     public void OnStateEntered(GameplayState state)
     {
         _languageWindow = UIManager.CreateWindow<LanguageMenuWindow>();
-        _languageWindow.OnLanguageSelected += SetLanguage;
         LayoutContainer.SetAnchorPreset(_languageWindow, LayoutContainer.LayoutPreset.Center);
-        RequestUpdate();
     }
 
     public void OnStateExited(GameplayState state)
