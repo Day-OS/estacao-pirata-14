@@ -1,4 +1,4 @@
-\using System.Linq;
+using System.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Content.Shared.CCVar;
@@ -74,7 +74,7 @@ namespace Content.Shared.Preferences
             List<string> antagPreferences,
             List<string> traitPreferences,
             List<string> loadoutPreferences)
-            : this(other.Name, other.FlavorText, other.Species, other.Age, other.Sex, other.Gender, other.Appearance, other.Clothing, other.Backpack,
+            : this(other.Name, other.FlavorText, other.Species, other.Age, other.Sex, other.Gender, other.Appearance, other.Clothing, other.Backpack, other.SpawnPriority,
                 jobPriorities, other.PreferenceUnavailable, antagPreferences, traitPreferences, loadoutPreferences)
         {
         }
@@ -101,7 +101,7 @@ namespace Content.Shared.Preferences
             IReadOnlyList<string> antagPreferences,
             IReadOnlyList<string> traitPreferences,
             IReadOnlyList<string> loadoutPreferences)
-            : this(name, flavortext, species, age, sex, gender, appearance, clothing, backpack, new Dictionary<string, JobPriority>(jobPriorities),
+            : this(name, flavortext, species, age, sex, gender, appearance, clothing, backpack, spawnPriority, new Dictionary<string, JobPriority>(jobPriorities),
                 preferenceUnavailable, new List<string>(antagPreferences), new List<string>(traitPreferences), new List<string>(loadoutPreferences))
         {
         }
@@ -124,31 +124,14 @@ namespace Content.Shared.Preferences
             SpawnPriorityPreference.None,
             new Dictionary<string, JobPriority>
             {
-                {SharedGameTicker.FallbackOverflowJob, JobPriority.High}
+                { SharedGameTicker.FallbackOverflowJob, JobPriority.High }
             },
             PreferenceUnavailableMode.SpawnAsOverflow,
             new List<string>(),
+            new List<string>(),
             new List<string>())
         {
-            //pode apagar?
-            return new(
-                "John Doe",
-                "",
-                SharedHumanoidAppearanceSystem.DefaultSpecies,
-                18,
-                Sex.Male,
-                Gender.Male,
-                HumanoidCharacterAppearance.Default(),
-                ClothingPreference.Jumpsuit,
-                BackpackPreference.Backpack,
-                new Dictionary<string, JobPriority>
-                {
-                    {SharedGameTicker.FallbackOverflowJob, JobPriority.High}
-                },
-                PreferenceUnavailableMode.SpawnAsOverflow,
-                new List<string>(),
-                new List<string>(),
-                new List<string>());
+
         }
 
         /// <summary>
