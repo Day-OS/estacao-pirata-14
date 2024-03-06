@@ -4,11 +4,11 @@ using Robust.Shared.Serialization;
 namespace Content.Shared.Swab;
 
 [Serializable, NetSerializable]
-public sealed class DiseaseSwabDoAfterEvent : SimpleDoAfterEvent
+public sealed partial class DiseaseSwabDoAfterEvent : SimpleDoAfterEvent
 {
 }
 
 [Serializable, NetSerializable]
-public sealed class BotanySwabDoAfterEvent : SimpleDoAfterEvent
+public sealed partial class BotanySwabDoAfterEvent : SimpleDoAfterEvent
 {
 }

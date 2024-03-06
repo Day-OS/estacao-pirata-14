@@ -65,38 +65,6 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             }
 
             UpdateScannedUser(uid, patient, true);
-        {
-                return;
-
-            _audio.PlayPvs(component.ScanningEndSound, args.Args.User);
-
-            UpdateScannedUser(uid, args.Args.User, args.Args.Target.Value, component);
-            // Below is for the traitor item
-            // Piggybacking off another component's doafter is complete CBT so I gave up
-            // and put it on the same component
-            /*
-             * this code is cursed wuuuuuuut
-             */
-            if (string.IsNullOrEmpty(component.Disease))
-            {
-                args.Handled = true;
-                return;
-            }
-
-            _disease.TryAddDisease(args.Args.Target.Value, component.Disease);
-
-            if (args.Args.User == args.Args.Target)
-            {
-                _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-self", ("disease", component.Disease)),
-                    args.Args.User, args.Args.User);
-            }
-            else
-            {
-                _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-other", ("target", Identity.Entity(args.Args.Target.Value, EntityManager)),
-                    ("disease", component.Disease)), args.Args.User, args.Args.User);
-            }
-
-            args.Handled = true;
         }
 
         private void OpenUserInterface(EntityUid user, HealthAnalyzerComponent healthAnalyzer)
@@ -137,6 +105,7 @@ public sealed class HealthAnalyzerSystem : EntitySystem
 
         _audio.PlayPvs(uid.Comp.ScanningBeginSound, uid);
 
+
         _doAfterSystem.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, uid.Comp.ScanDelay, new HealthAnalyzerDoAfterEvent(), uid, target: args.Target, used: uid)
         {
             BreakOnTargetMove = true,
@@ -151,6 +120,35 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             return;
 
         _audio.PlayPvs(uid.Comp.ScanningEndSound, uid);
+
+        UpdateScannedUser(uid, args.Args.User, args.Args.Target.Value, component);
+        // Below is for the traitor item
+        // Piggybacking off another component's doafter is complete CBT so I gave up
+        // and put it on the same component
+        /*
+         * this code is cursed wuuuuuuut
+         */
+        if (string.IsNullOrEmpty(component.Disease))
+        {
+            args.Handled = true;
+            return;
+        }
+
+        _disease.TryAddDisease(args.Args.Target.Value, component.Disease);
+
+        if (args.Args.User == args.Args.Target)
+        {
+            _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-self", ("disease", component.Disease)),
+                args.Args.User, args.Args.User);
+        }
+        else
+        {
+            _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-other", ("target", Identity.Entity(args.Args.Target.Value, EntityManager)),
+                ("disease", component.Disease)), args.Args.User, args.Args.User);
+        }
+
+        args.Handled = true;
+
 
         OpenUserInterface(args.User, uid);
         BeginAnalyzingEntity(uid, args.Target.Value);
