@@ -263,6 +263,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/cmo.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/cmo.rsi
+  - type: DiseaseProtection
+    protection: 0.15
 
 - type: entity
   parent: ClothingUniformBase
@@ -417,6 +419,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/medical.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/medical.rsi
+  - type: DiseaseProtection
+    protection: 0.1
 
 - type: entity
   parent: ClothingUniformBase
@@ -439,6 +443,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/paramedic.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/paramedic.rsi
+  - type: DiseaseProtection
+    protection: 0.1
 
 - type: entity
   parent: ClothingUniformBase
@@ -450,6 +456,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/brigmedic.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/brigmedic.rsi
+  - type: DiseaseProtection
+    protection: 0.1
 
 - type: entity
   parent: ClothingUniformBase
@@ -1103,6 +1111,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/ert_janitor.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/ert_janitor.rsi
+  - type: DiseaseProtection
+    protection: 0.1
 
 - type: entity
   parent: ClothingUniformBase
@@ -1125,6 +1135,8 @@
     sprite: Clothing/Uniforms/Jumpsuit/ert_medic.rsi
   - type: Clothing
     sprite: Clothing/Uniforms/Jumpsuit/ert_medic.rsi
+  - type: DiseaseProtection
+    protection: 0.15
 
 - type: entity
   parent: ClothingUniformBase

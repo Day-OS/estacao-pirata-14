@@ -1,12 +1,9 @@
 using Content.Server.Body.Components;
 using Content.Server.Chemistry.Containers.EntitySystems;
+using Content.Server.Disease;
 using Content.Server.Medical.Components;
+using Content.Server.Popups;
 using Content.Server.PowerCell;
-using Content.Server.Temperature.Components;
-using Content.Shared.Damage;
-using Content.Shared.DoAfter;
-using Content.Shared.Interaction;
-using Content.Shared.Interaction.Events;
 using Content.Shared.MedicalScanner;
 using Content.Shared.Mobs.Components;
 using Content.Shared.PowerCell;
@@ -37,6 +34,12 @@ public sealed class HealthAnalyzerSystem : EntitySystem
         SubscribeLocalEvent<HealthAnalyzerComponent, PowerCellSlotEmptyEvent>(OnPowerCellSlotEmpty);
         SubscribeLocalEvent<HealthAnalyzerComponent, DroppedEvent>(OnDropped);
     }
+        [Dependency] private readonly DiseaseSystem _disease = default!;
+        [Dependency] private readonly PopupSystem _popupSystem = default!;
+        [Dependency] private readonly PowerCellSystem _cell = default!;
+        [Dependency] private readonly SharedAudioSystem _audio = default!;
+        [Dependency] private readonly SharedDoAfterSystem _doAfterSystem = default!;
+        [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
 
     public override void Update(float frameTime)
     {
@@ -62,9 +65,63 @@ public sealed class HealthAnalyzerSystem : EntitySystem
             }
 
             UpdateScannedUser(uid, patient, true);
+        {
+                return;
+
+            _audio.PlayPvs(component.ScanningEndSound, args.Args.User);
+
+            UpdateScannedUser(uid, args.Args.User, args.Args.Target.Value, component);
+            // Below is for the traitor item
+            // Piggybacking off another component's doafter is complete CBT so I gave up
+            // and put it on the same component
+            /*
+             * this code is cursed wuuuuuuut
+             */
+            if (string.IsNullOrEmpty(component.Disease))
+            {
+                args.Handled = true;
+                return;
+            }
+
+            _disease.TryAddDisease(args.Args.Target.Value, component.Disease);
+
+            if (args.Args.User == args.Args.Target)
+            {
+                _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-self", ("disease", component.Disease)),
+                    args.Args.User, args.Args.User);
+            }
+            else
+            {
+                _popupSystem.PopupEntity(Loc.GetString("disease-scanner-gave-other", ("target", Identity.Entity(args.Args.Target.Value, EntityManager)),
+                    ("disease", component.Disease)), args.Args.User, args.Args.User);
+            }
+
+            args.Handled = true;
+        }
+
+        private void OpenUserInterface(EntityUid user, HealthAnalyzerComponent healthAnalyzer)
+        {
+            if (!TryComp<ActorComponent>(user, out var actor) || healthAnalyzer.UserInterface == null)
+                return;
+
+            _uiSystem.OpenUi(healthAnalyzer.UserInterface ,actor.PlayerSession);
+        }
+
+        public void UpdateScannedUser(EntityUid uid, EntityUid user, EntityUid? target, HealthAnalyzerComponent? healthAnalyzer)
+        {
+            if (!Resolve(uid, ref healthAnalyzer))
+                return;
+
+            if (target == null || healthAnalyzer.UserInterface == null)
+                return;
+
+            if (!HasComp<DamageableComponent>(target))
+                return;
+
+            OpenUserInterface(user, healthAnalyzer);
+            _uiSystem.SendUiMessage(healthAnalyzer.UserInterface, new HealthAnalyzerScannedUserMessage(target));
         }
     }
-
     private void OnEntityUnpaused(Entity<HealthAnalyzerComponent> ent, ref EntityUnpausedEvent args)
     {
         ent.Comp.NextUpdate += args.PausedTime;

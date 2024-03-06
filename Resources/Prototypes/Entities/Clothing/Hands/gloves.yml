@@ -139,6 +139,8 @@
     sprite: Clothing/Hands/Gloves/latex.rsi
   - type: Clothing
     sprite: Clothing/Hands/Gloves/latex.rsi
+  - type: DiseaseProtection
+    protection: 0.1
   - type: Fiber
     fiberMaterial: fibers-latex
   - type: FingerprintMask
@@ -153,6 +155,8 @@
     sprite: Clothing/Hands/Gloves/nitrile.rsi
   - type: Clothing
     sprite: Clothing/Hands/Gloves/nitrile.rsi
+  - type: DiseaseProtection
+    protection: 0.15
   - type: Fiber
     fiberMaterial: fibers-nitrile
   - type: FingerprintMask

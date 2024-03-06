@@ -34,3 +34,5 @@
     spawned:
     - id: MaterialCloth1
       amount: 1
+  - type: DiseaseProtection
+    protection: 0.05

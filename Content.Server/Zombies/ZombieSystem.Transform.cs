@@ -2,6 +2,8 @@ using Content.Server.Atmos.Components;
 using Content.Server.Body.Components;
 using Content.Server.Chat;
 using Content.Server.Chat.Managers;
+using Content.Server.Chat.Systems;
+using Content.Server.Disease.Components;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Humanoid;
 using Content.Server.IdentityManagement;
@@ -103,7 +105,9 @@ namespace Content.Server.Zombies
             var zombiecomp = AddComp<ZombieComponent>(target);
 
             //we need to basically remove all of these because zombies shouldn't
+
             //get diseases, breath, be thirst, be hungry, die in space, have offspring or be paraplegic.
+            RemComp<DiseaseCarrierComponent>(target);
             RemComp<RespiratorComponent>(target);
             RemComp<BarotraumaComponent>(target);
             RemComp<HungerComponent>(target);

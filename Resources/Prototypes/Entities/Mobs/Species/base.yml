@@ -143,6 +143,7 @@
   - type: Reflect
     enabled: false
     reflectProb: 0
+  - type: DiseaseCarrier
   - type: Body
     prototype: Human
     requiredLegs: 2

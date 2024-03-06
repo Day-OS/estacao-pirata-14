@@ -584,6 +584,67 @@
     - shuffle-artifact-popup
 
 - type: artifactEffect
+  id: EffectT4PartsSpawn
+  targetDepth: 3
+  effectHint: artifact-effect-hint-creation
+  components:
+  - type: SpawnArtifact
+    maxSpawns: 10
+    spawns:
+    - id: QuadraticCapacitorStockPart
+      prob: 0.5
+      maxAmount: 3
+    - id: FemtoManipulatorStockPart
+      prob: 0.5
+      maxAmount: 3
+    - id: BluespaceMatterBinStockPart
+      prob: 0.5
+      maxAmount: 3
+
+- type: artifactEffect
+  id: EffectDisease
+  targetDepth: 3
+  effectHint: artifact-effect-hint-biochemical
+  components:
+  - type: DiseaseArtifact
+    diseasePrototypes:
+    - VanAusdallsRobovirus
+    - OwOnavirus
+    - BleedersBite
+    - Ultragigacancer
+    - MemeticAmirmir
+    - TongueTwister
+    - AMIV
+
+- type: artifactEffect
+  id: EffectRareMaterialSpawn
+  targetDepth: 3
+  effectHint: artifact-effect-hint-creation
+  components:
+  - type: SpawnArtifact
+    spawns:
+    - id: SilverOre1
+      prob: 0.3
+      maxAmount: 3
+    - id: PlasmaOre1
+      prob: 0.3
+      maxAmount: 3
+    - id: GoldOre1
+      prob: 0.3
+      maxAmount: 3
+    - id: UraniumOre1
+      prob: 0.3
+      maxAmount: 3
+
+- type: artifactEffect
+  id: EffectHeat
+  targetDepth: 3
+  effectHint: artifact-effect-hint-release
+  components:
+  - type: TemperatureArtifact
+    targetTemp: 450
+
+- type: artifactEffect
   id: EffectFoamDangerous
   targetDepth: 3
   effectHint: artifact-effect-hint-biochemical

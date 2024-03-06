@@ -3,6 +3,8 @@ using System.Linq;
 using Content.Server.Actions;
 using Content.Server.Chat.Managers;
 using Content.Server.Chat.Systems;
+using Content.Server.Disease;
+using Content.Server.Disease.Components;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
@@ -41,6 +43,8 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
     [Dependency] private readonly IServerPreferencesManager _prefs = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
+    [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
+    [Dependency] private readonly DiseaseSystem _diseaseSystem = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly ActionsSystem _action = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
@@ -274,6 +278,9 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
             if (player.AttachedEntity == null || !HasComp<HumanoidAppearanceComponent>(player.AttachedEntity) || HasComp<ZombieImmuneComponent>(player.AttachedEntity))
                 continue;
 
+            if (!HasComp<DiseaseCarrierComponent>(player.AttachedEntity))
+                continue;
+
             if (HasComp<InitialInfectedExemptComponent>(player.AttachedEntity))
                 continue; // used (for example) on ERT
 
@@ -329,6 +336,13 @@ public sealed class ZombieRuleSystem : GameRuleSystem<ZombieRuleComponent>
             EnsureComp<IncurableZombieComponent>(ownedEntity);
             var inCharacterName = MetaData(ownedEntity).EntityName;
             _action.AddAction(ownedEntity, ref pending.Action, ZombieRuleComponent.ZombifySelfActionPrototype, ownedEntity);
+
+            var inCharacterName = string.Empty;
+            if (mind.OwnedEntity != null)
+            {
+                _diseaseSystem.TryAddDisease(mind.OwnedEntity.Value, component.InitialZombieVirusPrototype);
+                inCharacterName = MetaData(mind.OwnedEntity.Value).EntityName;
+            }
 
             var message = Loc.GetString("zombie-patientzero-role-greeting");
             var wrappedMessage = Loc.GetString("chat-manager-server-wrap-message", ("message", message));

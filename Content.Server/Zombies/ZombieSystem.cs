@@ -3,14 +3,13 @@ using Content.Server.Body.Systems;
 using Content.Server.Chat;
 using Content.Server.Chat.Systems;
 using Content.Server.Cloning;
+using Content.Server.Disease;
+using Content.Server.Disease.Components;
 using Content.Server.Drone.Components;
 using Content.Server.Emoting.Systems;
 using Content.Server.Inventory;
 using Content.Server.Speech.EntitySystems;
-using Content.Shared.Bed.Sleep;
-using Content.Shared.Cloning;
 using Content.Shared.Damage;
-using Content.Shared.Humanoid;
 using Content.Shared.Inventory;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
@@ -27,28 +26,15 @@ namespace Content.Server.Zombies
 {
     public sealed partial class ZombieSystem : SharedZombieSystem
     {
-        [Dependency] private readonly IGameTiming _timing = default!;
-        [Dependency] private readonly IPrototypeManager _protoManager = default!;
-        [Dependency] private readonly IRobustRandom _random = default!;
+        [Dependency] private readonly DiseaseSystem _disease = default!;
         [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
         [Dependency] private readonly DamageableSystem _damageable = default!;
+        [Dependency] private readonly ZombifyOnDeathSystem _zombify = default!;
         [Dependency] private readonly ServerInventorySystem _inv = default!;
         [Dependency] private readonly ChatSystem _chat = default!;
         [Dependency] private readonly AutoEmoteSystem _autoEmote = default!;
         [Dependency] private readonly EmoteOnDamageSystem _emoteOnDamage = default!;
-        [Dependency] private readonly MetaDataSystem _metaData = default!;
-        [Dependency] private readonly MobStateSystem _mobState = default!;
-        [Dependency] private readonly SharedPopupSystem _popup = default!;
-
-        public const SlotFlags ProtectiveSlots =
-            SlotFlags.FEET |
-            SlotFlags.HEAD |
-            SlotFlags.EYES |
-            SlotFlags.GLOVES |
-            SlotFlags.MASK |
-            SlotFlags.NECK |
-            SlotFlags.INNERCLOTHING |
-            SlotFlags.OUTERCLOTHING;
+        [Dependency] private readonly HumanoidAppearanceSystem _humanoidSystem = default!;
 
         public override void Initialize()
         {
@@ -61,67 +47,30 @@ namespace Content.Server.Zombies
             SubscribeLocalEvent<ZombieComponent, MeleeHitEvent>(OnMeleeHit);
             SubscribeLocalEvent<ZombieComponent, MobStateChangedEvent>(OnMobState);
             SubscribeLocalEvent<ZombieComponent, CloningEvent>(OnZombieCloning);
+            SubscribeLocalEvent<ZombieComponent, AttemptSneezeCoughEvent>(OnSneeze);
             SubscribeLocalEvent<ZombieComponent, TryingToSleepEvent>(OnSleepAttempt);
-            SubscribeLocalEvent<ZombieComponent, GetCharactedDeadIcEvent>(OnGetCharacterDeadIC);
 
             SubscribeLocalEvent<PendingZombieComponent, MapInitEvent>(OnPendingMapInit);
-
-            SubscribeLocalEvent<ZombifyOnDeathComponent, MobStateChangedEvent>(OnDamageChanged);
         }
 
         private void OnPendingMapInit(EntityUid uid, PendingZombieComponent component, MapInitEvent args)
         {
-            component.NextTick = _timing.CurTime + TimeSpan.FromSeconds(1f);
+            component.NextTick = _timing.CurTime;
         }
 
         public override void Update(float frameTime)
         {
             base.Update(frameTime);
+            var query = EntityQueryEnumerator<PendingZombieComponent>();
             var curTime = _timing.CurTime;
 
-            // Hurt the living infected
-            var query = EntityQueryEnumerator<PendingZombieComponent, DamageableComponent, MobStateComponent>();
-            while (query.MoveNext(out var uid, out var comp, out var damage, out var mobState))
+            while (query.MoveNext(out var uid, out var comp))
             {
-                // Process only once per second
-                if (comp.NextTick > curTime)
+                if (comp.NextTick < curTime)
                     continue;
 
-                comp.NextTick = curTime + TimeSpan.FromSeconds(1f);
-
-                comp.GracePeriod -= TimeSpan.FromSeconds(1f);
-                if (comp.GracePeriod > TimeSpan.Zero)
-                    continue;
-
-                if (_random.Prob(comp.InfectionWarningChance))
-                    _popup.PopupEntity(Loc.GetString(_random.Pick(comp.InfectionWarnings)), uid, uid);
-
-                var multiplier = _mobState.IsCritical(uid, mobState)
-                    ? comp.CritDamageMultiplier
-                    : 1f;
-
-                _damageable.TryChangeDamage(uid, comp.Damage * multiplier, true, false, damage);
-            }
-
-            // Heal the zombified
-            var zombQuery = EntityQueryEnumerator<ZombieComponent, DamageableComponent, MobStateComponent>();
-            while (zombQuery.MoveNext(out var uid, out var comp, out var damage, out var mobState))
-            {
-                // Process only once per second
-                if (comp.NextTick + TimeSpan.FromSeconds(1) > curTime)
-                    continue;
-
-                comp.NextTick = curTime;
-
-                if (_mobState.IsDead(uid, mobState))
-                    continue;
-
-                var multiplier = _mobState.IsCritical(uid, mobState)
-                    ? comp.PassiveHealingCritMultiplier
-                    : 1f;
-
-                // Gradual healing for living zombies.
-                _damageable.TryChangeDamage(uid, comp.PassiveHealing * multiplier, true, false, damage);
+                comp.NextTick += TimeSpan.FromSeconds(1);
+                _damageable.TryChangeDamage(uid, comp.Damage, true, false);
             }
         }
 
@@ -172,6 +121,11 @@ namespace Content.Server.Zombies
             }
         }
 
+        private void OnSneeze(EntityUid uid, ZombieComponent component, ref AttemptSneezeCoughEvent args)
+        {
+            args.Cancelled = true;
+        }
+
         private float GetZombieInfectionChance(EntityUid uid, ZombieComponent component)
         {
             var max = component.MaxZombieInfectionChance;
@@ -217,18 +171,14 @@ namespace Content.Server.Zombies
                 if (!TryComp<MobStateComponent>(entity, out var mobState) || HasComp<DroneComponent>(entity))
                     continue;
 
+                if (_random.Prob(GetZombieInfectionChance(entity, component)))
+                {
+                    EnsureComp<PendingZombieComponent>(entity);
+                    EnsureComp<ZombifyOnDeathComponent>(entity);
+                }
+
                 if (HasComp<ZombieComponent>(entity))
-                {
-                    args.BonusDamage = -args.BaseDamage;
-                }
-                else
-                {
-                    if (!HasComp<ZombieImmuneComponent>(entity) && !HasComp<NonSpreaderZombieComponent>(args.User) && _random.Prob(GetZombieInfectionChance(entity, component)))
-                    {
-                        EnsureComp<PendingZombieComponent>(entity);
-                        EnsureComp<ZombifyOnDeathComponent>(entity);
-                    }
-                }
+                    args.BonusDamage = -args.BaseDamage * zombieComp.OtherZombieDamageCoefficient;
 
                 if (_mobState.IsIncapacitated(entity, mobState) && !HasComp<ZombieComponent>(entity) && !HasComp<ZombieImmuneComponent>(entity))
                 {

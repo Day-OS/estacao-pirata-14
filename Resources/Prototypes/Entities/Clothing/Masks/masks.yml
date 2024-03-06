@@ -10,6 +10,8 @@
     sprite: Clothing/Mask/gas.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.05
   - type: IdentityBlocker
   - type: Tag
     tags:
@@ -84,6 +86,8 @@
     sprite: Clothing/Mask/gascaptain.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.05
 
 - type: entity
   parent: ClothingMaskGasAtmos
@@ -97,6 +101,8 @@
     sprite: Clothing/Mask/gascentcom.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.05
 
 - type: entity
   parent: ClothingMaskGas
@@ -130,6 +136,8 @@
     sprite: Clothing/Mask/medical.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.10
   - type: Tag
     tags:
     - PetWearable
@@ -169,6 +177,8 @@
     sprite: Clothing/Mask/breath.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.05
   - type: Tag
     tags:
     - PetWearable
@@ -264,6 +274,8 @@
     storedRotation: -90
   - type: IdentityBlocker
     coverage: MOUTH
+  - type: DiseaseProtection
+    protection: 0.1
 
 - type: entity
   parent: ClothingMaskBase
@@ -297,6 +309,8 @@
     sprite: Clothing/Mask/plaguedoctormask.rsi
   - type: BreathMask
   - type: IngestionBlocker
+  - type: DiseaseProtection
+    protection: 0.1
   - type: IdentityBlocker
 
 - type: entity

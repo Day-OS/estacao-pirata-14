@@ -96,4 +96,6 @@ public sealed partial class ZombieRuleComponent : Component
 
     [ValidatePrototypeId<EntityPrototype>]
     public const string ZombifySelfActionPrototype = "ActionTurnUndead";
+
+    public string InitialZombieVirusPrototype = "PassiveZombieVirus";
 }

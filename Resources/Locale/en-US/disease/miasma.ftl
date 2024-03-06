@@ -19,3 +19,7 @@ rotting-extremely-bloated = [color=red]{ CAPITALIZE(POSS-ADJ($target)) } corpse 
 rotting-rotting-nonmob = [color=orange]{ CAPITALIZE(SUBJECT($target)) } is rotting![/color]
 rotting-bloated-nonmob = [color=orangered]{ CAPITALIZE(SUBJECT($target)) } is bloated![/color]
 rotting-extremely-bloated-nonmob = [color=red]{ CAPITALIZE(SUBJECT($target)) } is extremely bloated![/color]
+miasma-smell = Something smells foul!
+miasma-rotting = [color=orange]It's rotting![/color]
+miasma-bloated = [color=orangered]It's bloated![/color]
+miasma-extremely-bloated = [color=red]It's extremely bloated![/color]

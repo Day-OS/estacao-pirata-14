@@ -352,6 +352,8 @@
   - type: PressureProtection
     highPressureMultiplier: 0.3
     lowPressureMultiplier: 1000
+  - type: DiseaseProtection
+    protection: 0.2
   - type: Armor
     modifiers:
       coefficients:
@@ -450,6 +452,8 @@
   - type: PressureProtection
     highPressureMultiplier: 0.5
     lowPressureMultiplier: 1000
+  - type: DiseaseProtection
+    protection: 0.2
   - type: ExplosionResistance
     damageCoefficient: 0.5
   - type: Armor
@@ -486,6 +490,8 @@
     lowPressureMultiplier: 1000
   - type: ExplosionResistance
     damageCoefficient: 0.5
+  - type: DiseaseProtection
+    protection: 0.15
   - type: Armor
     modifiers:
       coefficients:
@@ -740,6 +746,8 @@
     clothingPrototype: ClothingHeadHelmetHardsuitPirateCap
   - type: StaticPrice
     price: 0
+  - type: DiseaseProtection
+    protection: 0.2
 
 #CENTCOMM / ERT HARDSUITS
 #ERT Leader Hardsuit
@@ -783,6 +791,8 @@
     sprite: Clothing/OuterClothing/Hardsuits/ERTSuits/ertmedical.rsi
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitERTMedical
+  - type: DiseaseProtection
+    protection: 0.25
 
 #ERT Security Hardsuit
 - type: entity
@@ -881,6 +891,8 @@
   - type: HeldSpeedModifier
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetCBURN
+  - type: DiseaseProtection
+    protection: 0.4
 
 #MISC. HARDSUITS
 #Clown Hardsuit
