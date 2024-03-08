@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text;
+using Content.Server.GameTicking.Events;
 using Content.Shared.GameTicking;
 using Content.Shared.Language;
 using Content.Shared.Language.Systems;
@@ -22,7 +23,7 @@ public sealed partial class LanguageSystem : SharedLanguageSystem
         base.Initialize();
 
         SubscribeLocalEvent<LanguageSpeakerComponent, ComponentInit>(OnInitLanguageSpeaker);
-        SubscribeAllEvent<RoundStartedEvent>(it => RandomRoundSeed = _random.Next());
+        SubscribeAllEvent<RoundStartingEvent>(it => RandomRoundSeed = _random.Next());
 
         InitializeWindows();
     }

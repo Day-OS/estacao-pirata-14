@@ -15,7 +15,7 @@ namespace Content.Client.Language;
 public sealed partial class LanguageMenuWindow : DefaultWindow
 {
     [Dependency] private readonly IConsoleHost _consoleHost = default!;
-    private readonly LanguageSystem _language;
+    private readonly SharedLanguageSystem _language;
 
     private readonly List<EntryState> _entries = new();
 
@@ -23,7 +23,7 @@ public sealed partial class LanguageMenuWindow : DefaultWindow
     {
         RobustXamlLoader.Load(this);
         IoCManager.InjectDependencies(this);
-        _language = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<LanguageSystem>();
+        _language = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<SharedLanguageSystem>();
 
         Title = Loc.GetString("language-menu-window-title");
     }
