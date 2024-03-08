@@ -58,7 +58,6 @@
       types:
         Heat : 1.5 #per second, scales with temperature & other constants
   - type: Wagging
-        Heat : 0.1 #per second, scales with temperature & other constants
   - type: LanguageSpeaker
     speaks:
     - GalacticCommon

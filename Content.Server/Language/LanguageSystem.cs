@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Text;
+using Content.Server.GameTicking.Events;
 using Content.Shared.GameTicking;
 using Content.Shared.Language;
 using Robust.Shared.Random;
@@ -21,7 +22,7 @@ public sealed class LanguageSystem : SharedLanguageSystem
     {
         base.Initialize();
         SubscribeLocalEvent<LanguageSpeakerComponent, ComponentInit>(OnInitLanguageSpeaker);
-        SubscribeAllEvent<RoundStartedEvent>(it => RandomRoundSeed = _random.Next());
+        SubscribeAllEvent<RoundStartingEvent>(it => RandomRoundSeed = _random.Next());
         SubscribeLocalEvent<LanguageSpeakerComponent, LanguageMenuActionEvent>(MenuEvent);
     }
 
