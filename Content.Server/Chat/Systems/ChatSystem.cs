@@ -445,15 +445,20 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("fontType", speech.FontId),
             ("fontSize", speech.FontSize),
             ("message", FormattedMessage.EscapeText(message)));
-        var wrappedMessage = WrapPublicMessage(source, name, message);
-        var obfuscated = _language.ObfuscateSpeech(source, message, language);
-        var wrappedObfuscated = WrapPublicMessage(source, name, obfuscated);
 
-        SendInVoiceRange(ChatChannel.Local, message, wrappedMessage, source, range);
+
+        var obfuscated = _language.ObfuscateSpeech(source, message, language);
+        // Code is lazily repeated so if an update from the wizden codebase changes anything here, it will not break as much
+        var wrappedObfuscated = Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
+            ("entityName", coloredName),
+            ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
+            ("fontType", speech.FontId),
+            ("fontSize", speech.FontSize),
+            ("message", FormattedMessage.EscapeText(obfuscated)));
+
         SendInVoiceRange(ChatChannel.Local, name, message, wrappedMessage, obfuscated, wrappedObfuscated, source, range);
 
-        var ev = new EntitySpokeEvent(source, message, null, null);
-        var ev = new EntitySpokeEvent(source, message, null, false, language);
+        var ev = new EntitySpokeEvent(source, message, null, obfuscated, language);
         RaiseLocalEvent(source, ev, true);
 
         // To avoid logging any messages sent by entities that are not players, like vendors, cloning, etc.
@@ -531,12 +536,10 @@ public sealed partial class ChatSystem : SharedChatSystem
 
         foreach (var (session, data) in GetRecipients(source, WhisperMuffledRange))
         {
-            EntityUid listener;
 
             if (session.AttachedEntity is not { Valid: true } playerEntity)
-            if (session.AttachedEntity is not { Valid: true } listener)
                 continue;
-            listener = session.AttachedEntity.Value;
+            var listener = session.AttachedEntity.Value;
 
             if (MessageRangeCheck(session, data, range) != MessageRangeCheckResult.Full)
                 continue; // Won't get logged to chat, and ghosts are too far away to see the pop-up, so we just won't send it to them.
@@ -561,8 +564,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("message", FormattedMessage.EscapeText(message)));
         _replay.RecordServerMessage(new ChatMessage(ChatChannel.Whisper, message, replayWrap, GetNetEntity(source), null, MessageRangeHideChatForReplay(range)));
 
-        var ev = new EntitySpokeEvent(source, message, channel, obfuscatedMessage);
-        var ev = new EntitySpokeEvent(source, message, channel, true, language);
+        var ev = new EntitySpokeEvent(source, message, channel, obfuscatedMessage, language);
         RaiseLocalEvent(source, ev, true);
         if (!hideLog)
             if (originalMessage == message)
@@ -609,8 +611,7 @@ public sealed partial class ChatSystem : SharedChatSystem
 
         if (checkEmote)
             TryEmoteChatInput(source, action);
-        SendInVoiceRange(ChatChannel.Emotes, action, wrappedMessage, source, range, author);
-        // Emotes are skipped in obfuscation check
+       // Emotes are skipped in obfuscation check
         SendInVoiceRange(ChatChannel.Emotes, name, action, wrappedMessage, obfuscated: "", obfuscatedWrappedMessage: "", source, range, author);
         if (!hideLog)
             if (name != Name(source))
@@ -638,7 +639,6 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("entityName", name),
             ("message", FormattedMessage.EscapeText(message)));
 
-        SendInVoiceRange(ChatChannel.LOOC, message, wrappedMessage, source, hideChat ? ChatTransmitRange.HideChat : ChatTransmitRange.Normal, player.UserId);
         SendInVoiceRange(ChatChannel.LOOC, name, message, wrappedMessage,
             obfuscated: string.Empty,
             obfuscatedWrappedMessage: string.Empty, // will be skipped anyway
@@ -736,8 +736,16 @@ public sealed partial class ChatSystem : SharedChatSystem
     /// <summary>
     ///     Sends a chat message to the given players in range of the source entity.
     /// </summary>
-    private void SendInVoiceRange(ChatChannel channel, string message, string wrappedMessage, EntityUid source, ChatTransmitRange range, NetUserId? author = null)
-    private void SendInVoiceRange(ChatChannel channel, string name, string message, string wrappedMessage, string obfuscated, string obfuscatedWrappedMessage, EntityUid source, ChatTransmitRange range, NetUserId? author = null)
+    private void SendInVoiceRange(
+        ChatChannel channel,
+        string name,
+        string message,
+        string wrappedMessage,
+        string obfuscated,
+        string obfuscatedWrappedMessage,
+        EntityUid source,
+        ChatTransmitRange range,
+        NetUserId? author = null)
     {
         foreach (var (session, data) in GetRecipients(source, VoiceRange))
         {
@@ -1030,7 +1038,6 @@ public sealed class EntitySpokeEvent : EntityEventArgs
     public readonly EntityUid Source;
     public readonly string Message;
     public readonly string? ObfuscatedMessage; // not null if this was a whisper
-    public readonly bool IsWhisper;
     public readonly LanguagePrototype Language;
 
     /// <summary>
@@ -1039,14 +1046,12 @@ public sealed class EntitySpokeEvent : EntityEventArgs
     /// </summary>
     public RadioChannelPrototype? Channel;
 
-    public EntitySpokeEvent(EntityUid source, string message, RadioChannelPrototype? channel, string? obfuscatedMessage)
-    public EntitySpokeEvent(EntityUid source, string message, RadioChannelPrototype? channel, bool isWhisper, LanguagePrototype language)
+    public EntitySpokeEvent(EntityUid source, string message, RadioChannelPrototype? channel, string? obfuscatedMessage, LanguagePrototype language)
     {
         Source = source;
         Message = message;
         Channel = channel;
         ObfuscatedMessage = obfuscatedMessage;
-        IsWhisper = isWhisper;
         Language = language;
     }
 }

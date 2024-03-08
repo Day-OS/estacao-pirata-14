@@ -56,13 +56,13 @@ public sealed class RadioSystem : EntitySystem
     {
         if (TryComp(uid, out ActorComponent? actor)){
             var listener = component.Owner;
-            var msg = args.UnderstoodChatMsg;
+            var msg = args.ChatMsg;
             if (listener != null && !_language.CanUnderstand(listener, args.Language))
             {
                 msg = args.NotUnderstoodChatMsg;
             }
 
-            _netMan.ServerSendMessage(new MsgChatMessage { Message = msg}, actor.PlayerSession.ConnectedClient);
+            _netMan.ServerSendMessage(new MsgChatMessage { Message = msg.Message}, actor.PlayerSession.ConnectedClient);
         }
     }
 
@@ -78,9 +78,8 @@ public sealed class RadioSystem : EntitySystem
     /// </summary>
     /// <param name="messageSource">Entity that spoke the message</param>
     /// <param name="radioSource">Entity that picked up the message and will send it, e.g. headset</param>
-    public void SendRadioMessage(EntityUid messageSource, string message, RadioChannelPrototype channel, EntityUid radioSource, bool escapeMarkup = true)
     /// <param name="language">The language to send the message in. Defaults to galactic common.</param>
-    public void SendRadioMessage(EntityUid messageSource, string message, RadioChannelPrototype channel, EntityUid radioSource, LanguagePrototype? language = null)
+    public void SendRadioMessage(EntityUid messageSource, string message, RadioChannelPrototype channel, EntityUid radioSource, LanguagePrototype? language = null, bool escapeMarkup = true)
     {
         if (language == null)
         {
@@ -123,15 +122,25 @@ public sealed class RadioSystem : EntitySystem
 
         // most radios are relayed to chat, so lets parse the chat message beforehand
         // A message that the listener could understand
-        var wrappedMessage = WrapRadioMessage(messageSource, channel, name, message);
-        var msg = new ChatMessage(ChatChannel.Radio, message, wrappedMessage, NetEntity.Invalid, null);
+        var chat = new ChatMessage(ChatChannel.Radio, message, wrappedMessage, NetEntity.Invalid, null);
 
         // ... you guess it
+        // Code is lazily repeated so if an update from the wizden codebase changes anything here, it will not break as much
         var obfuscated = _language.ObfuscateSpeech(null, message, language);
-        var obfuscatedWrapped = WrapRadioMessage(messageSource, channel, name, obfuscated);
+        var obfuscatedWrapped = Loc.GetString(speech.Bold ? "chat-radio-message-wrap-bold" : "chat-radio-message-wrap",
+            ("color", channel.Color),
+            ("fontType", speech.FontId),
+            ("fontSize", speech.FontSize),
+            ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
+            ("channel", $"\\[{channel.LocalizedName}\\]"),
+            ("name", name),
+            ("message", obfuscated));
+
         var notUdsMsg = new ChatMessage(ChatChannel.Radio, obfuscated, obfuscatedWrapped, NetEntity.Invalid, null);
 
-        var ev = new RadioReceiveEvent(messageSource, channel, msg, notUdsMsg, language);
+        var chatMsg = new MsgChatMessage { Message = chat };
+        var chatObfuscatedMsg = new MsgChatMessage { Message = notUdsMsg };
+        var ev = new RadioReceiveEvent(message, messageSource, channel, chatMsg, chatObfuscatedMsg, language);
 
         var sendAttemptEv = new RadioSendAttemptEvent(channel, radioSource);
         RaiseLocalEvent(ref sendAttemptEv);
@@ -179,19 +188,6 @@ public sealed class RadioSystem : EntitySystem
 
         _replay.RecordServerMessage(notUdsMsg);
         _messages.Remove(message);
-    }
-
-    private string WrapRadioMessage(EntityUid source, RadioChannelPrototype channel, string name, string message)
-    {
-        var speech = _chat.GetSpeechVerb(source, message);
-        return Loc.GetString(speech.Bold ? "chat-radio-message-wrap-bold" : "chat-radio-message-wrap",
-            ("color", channel.Color),
-            ("fontType", speech.FontId),
-            ("fontSize", speech.FontSize),
-            ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
-            ("channel", $"\\[{channel.LocalizedName}\\]"),
-            ("name", name),
-            ("message", FormattedMessage.EscapeText(message)));
     }
 
     /// <inheritdoc cref="TelecomServerComponent"/>

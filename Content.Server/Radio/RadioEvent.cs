@@ -10,10 +10,11 @@ namespace Content.Server.Radio;
 /// </summary>
 [ByRefEvent]
 public readonly record struct RadioReceiveEvent(
+    string Message,
     EntityUid MessageSource,
     RadioChannelPrototype Channel,
-    ChatMessage UnderstoodChatMsg,
-    ChatMessage NotUnderstoodChatMsg,
+    MsgChatMessage ChatMsg,
+    MsgChatMessage NotUnderstoodChatMsg,
     LanguagePrototype Language
 );
 

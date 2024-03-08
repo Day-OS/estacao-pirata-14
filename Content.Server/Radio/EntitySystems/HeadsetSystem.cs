@@ -102,12 +102,13 @@ public sealed class HeadsetSystem : SharedHeadsetSystem
 
     private void OnHeadsetReceive(EntityUid uid, HeadsetComponent component, ref RadioReceiveEvent args)
     {
-        if (TryComp(Transform(uid).ParentUid, out ActorComponent? actor))
+        var parent = Transform(uid).ParentUid;
+        if (TryComp(parent, out ActorComponent? actor))
         {
             var canUnderstand = _language.CanUnderstand(parent, args.Language);
             var msg = new MsgChatMessage
             {
-                Message = canUnderstand ? args.UnderstoodChatMsg : args.NotUnderstoodChatMsg
+                Message = canUnderstand ? args.ChatMsg.Message : args.NotUnderstoodChatMsg.Message
             };
             _netMan.ServerSendMessage(msg, actor.PlayerSession.ConnectedClient);
         }
