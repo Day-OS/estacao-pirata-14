@@ -148,7 +148,6 @@
     #  bloodlossHealDamage:
     #    types:
     #      Burn: 0
-    - type: UnblockableSpeech
     - type: Flashable
     - type: Flammable
       fireSpread: true
@@ -223,9 +222,9 @@
       speechSounds: Pai
     - type: Vocal
       sounds:
-        Male: UnisexIPC
-        Female: UnisexIPC
-        Unsexed: UnisexIPC
+        Male: MaleHuman
+        Female: FemaleHuman
+        Unsexed: MaleHuman
     - type: MeleeWeapon
       hidden: true
       soundHit:
