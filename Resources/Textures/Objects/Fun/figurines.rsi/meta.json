@@ -162,6 +162,12 @@
         },
         {
             "name": "figurine_spawner"
+        },
+        {
+            "name": "ntsra"
+        },
+        {
+            "name": "mi13hard"
         }
     ]
 }

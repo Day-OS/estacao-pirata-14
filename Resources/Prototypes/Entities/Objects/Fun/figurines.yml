@@ -466,3 +466,19 @@
   components:
   - type: Sprite
     state: thiefcharacter
+
+- type: entity
+  parent: BaseFigurine
+  id: ToyFigurineNTSRA
+  name: ntsra character figure
+  components:
+  - type: Sprite
+    state: ntsra
+
+- type: entity
+  parent: BaseFigurine
+  id: ToyFigurineMI13Hard
+  name: mi13 hardsuit character figure
+  components:
+  - type: Sprite
+    state: mi13hard
