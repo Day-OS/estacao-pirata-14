@@ -87,6 +87,11 @@ public sealed partial class SiliconComponent : Component
     [DataField("chargeThresholdCritical"), ViewVariables(VVAccess.ReadWrite)]
     public float? ChargeThresholdCritical = 0.1f;
 
+    //The multiplier of firestack acquired while being ignited
+    [DataField("fireStackMultiplier"), ViewVariables(VVAccess.ReadWrite)]
+    public float? FireStackMultiplier = 1;
+
+
 
     /// <summary>
     ///     The amount the Silicon will be slowed at each charge state.

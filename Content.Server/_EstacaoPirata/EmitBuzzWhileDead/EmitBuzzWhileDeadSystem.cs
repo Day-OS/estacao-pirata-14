@@ -1,5 +1,5 @@
 ﻿using Content.Server.Popups;
-using Content.Shared._EstacaoPirata.EmitBuzzOnCrit;
+using Content.Shared._EstacaoPirata.EmitBuzzWhileDead;
 using Content.Shared.Audio;
 using Content.Shared.Body.Components;
 using Content.Shared.Mobs.Systems;
@@ -7,12 +7,12 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
-namespace Content.Server._EstacaoPirata.EmitBuzzOnCrit;
+namespace Content.Server._EstacaoPirata.EmitBuzzWhileDead;
 
 /// <summary>
 /// This handles the buzzing popup and sound of a silicon based race when it goes into critical health.
 /// </summary>
-public sealed class EmitBuzzOnCritSystem : EntitySystem
+public sealed class EmitBuzzWhileDeadSystem : EntitySystem
 {
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly IGameTiming _gameTiming = default!;
@@ -24,13 +24,11 @@ public sealed class EmitBuzzOnCritSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        var query = EntityQueryEnumerator<EmitBuzzOnCritComponent, BodyComponent>();
+        var query = EntityQueryEnumerator<EmitBuzzWhileDeadComponent, BodyComponent>();
 
         while (query.MoveNext(out var uid, out var emitBuzzOnCritComponent, out var body))
         {
-            if (_mobState.IsDead(uid))
-                continue;
-            if (!_mobState.IsCritical(uid))
+            if (!_mobState.IsDead(uid))
                 continue;
 
             emitBuzzOnCritComponent.AccumulatedFrametime += frameTime;

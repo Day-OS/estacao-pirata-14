@@ -15,4 +15,8 @@ public sealed partial class DeathgaspComponent : Component
     /// </summary>
     [DataField("prototype", customTypeSerializer:typeof(PrototypeIdSerializer<EmotePrototype>))]
     public string Prototype = "DefaultDeathgasp";
+
+
+    [DataField("needsCritical")]
+    public bool NeedsCritical = true;
 }

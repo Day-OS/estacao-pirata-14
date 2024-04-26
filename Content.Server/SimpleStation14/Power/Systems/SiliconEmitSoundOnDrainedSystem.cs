@@ -6,7 +6,7 @@ using Content.Shared.SimpleStation14.Silicon.Systems;
 
 namespace Content.Server.SimpleStation14.Silicon;
 
-public sealed class EmitSoundOnCritSystem : EntitySystem
+public sealed class EmitSoundOnDrainedSystem : EntitySystem
 {
 
     [Dependency] private readonly EmitSoundSystem _emitSound = default!;
@@ -26,7 +26,7 @@ public sealed class EmitSoundOnCritSystem : EntitySystem
         spamComp.MaxInterval = component.MaxInterval;
         spamComp.PopUp = component.PopUp;
         spamComp.Sound = component.Sound;
-	_emitSound.SetEnabled((uid, spamComp), true);
+	    _emitSound.SetEnabled((uid, spamComp), true);
     }
 
     private void OnAlive(EntityUid uid, SiliconEmitSoundOnDrainedComponent component, SiliconChargeAliveEvent args)

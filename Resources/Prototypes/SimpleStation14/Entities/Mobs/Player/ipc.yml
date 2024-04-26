@@ -46,8 +46,8 @@
   - type: MobThresholds
     thresholds:
       0: Alive
-      140: Critical
-      180: Dead
+      119.999: Critical # TO make it almost impossible
+      120: Dead
   - type: TypingIndicator
     proto: robot
   - type: Destructible
@@ -94,7 +94,7 @@
 # Erro de linter
 #   - type: Wires
 #     layoutId: IPC
-  - type: EmitBuzzOnCrit
+  - type: EmitBuzzWhileDead
 
 - type: entity
   save: false
